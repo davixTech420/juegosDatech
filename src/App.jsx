@@ -1,31 +1,20 @@
 import { useState } from 'react';
-import { Header } from './components/Header';
-import { ProductList } from './components/ProductList';
+import  { BrowserRouter,Routes,Route, Navigate  } from 'react-router-dom'
+import { ClienteRoutes, PublicRoutes } from './routes/Routes';
 
 function App() {
-	const [allProducts, setAllProducts] = useState([]);
-	const [total, setTotal] = useState(0);
-	const [countProducts, setCountProducts] = useState(0);
-
 	return (
-		<>
-			<Header
-				allProducts={allProducts}
-				setAllProducts={setAllProducts}
-				total={total}
-				setTotal={setTotal}
-				countProducts={countProducts}
-				setCountProducts={setCountProducts}
-			/>
-			<ProductList
-				allProducts={allProducts}
-				setAllProducts={setAllProducts}
-				total={total}
-				setTotal={setTotal}
-				countProducts={countProducts}
-				setCountProducts={setCountProducts}
-			/>
-		</>
+
+		<BrowserRouter>
+		<Routes>
+
+			<Route path="/" element={ < Navigate to="/Games"/>  }/>
+			<Route path='*' element={ <PublicRoutes/> }/>
+			<Route path='/cliente/*' element={ <ClienteRoutes/> }></Route>
+		</Routes>
+		
+		</BrowserRouter>
+		
 	);
 }
 
