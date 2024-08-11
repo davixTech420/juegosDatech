@@ -19,6 +19,8 @@ import {
 } from "@mui/material";
 
 const Games = () => {
+  /*este es el stado del juego seleccionado */
+  const [gameSelect,setGameSelect] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
   const [games, setGames] = useState([]);
   const [openAlert, setOpenAlert] = useState(false);
@@ -98,9 +100,7 @@ const Games = () => {
             Agregado Al Carrito Exitosamente
           </Alert>
         </Snackbar>
-  <Ventana openDialog={openDialog} closeDialog={closeDialog} />
-
-
+  
       <Header
         allProducts={allProducts}
         setAllProducts={setAllProducts}
@@ -121,11 +121,17 @@ const Games = () => {
 
       <Grid container spacing={2} sx={{ marginBottom: 5 }}>
        {filteredGames.map((product, index) => (
+        
+       
           <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
+            
             <Paper elevation={3}>
               <Card key={product.id} >
                 <CardMedia
-                onClick={() => setOpenDialog(true)}
+                onClick={() =>{
+                  setOpenDialog(true);
+                  setGameSelect(product);
+                } }
                   component="img"
                   alt="green iguana"
                   height="240"
@@ -153,7 +159,10 @@ const Games = () => {
               </Card>
             </Paper>
           </Grid>
+
+          
         ))}
+        <Ventana openDialog={openDialog} closeDialog={closeDialog} product={gameSelect} />
       </Grid>
       <FooterPublic />
     </>
