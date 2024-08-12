@@ -16,19 +16,44 @@ import {
   TextField,
   Alert,
   Snackbar,
+  AppBar,
+  Toolbar,
+  Box,
+  Tabs,
+  Tab,
 } from "@mui/material";
 
 const Games = () => {
   /*este es el stado del juego seleccionado */
-  const [gameSelect,setGameSelect] = useState(null);
-    const [openDialog, setOpenDialog] = useState(false);
+  const [gameSelect, setGameSelect] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
   const [games, setGames] = useState([]);
   const [openAlert, setOpenAlert] = useState(false);
   const [allProducts, setAllProducts] = useState([]);
   const [total, setTotal] = useState(0);
   const [countProducts, setCountProducts] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [filteredGames, setFilteredGames] = useState([]);
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  const saveCartToLocalStorage = () => {
+    localStorage.setItem(
+      "cart",
+      JSON.stringify({
+        allProducts,
+        total,
+        countProducts,
+      })
+    );
+  };
+
+  useEffect(() => {
+    saveCartToLocalStorage();
+  }, [allProducts, total, countProducts]);
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -36,7 +61,7 @@ const Games = () => {
         const response = await axios.get("https://api.rawg.io/api/games", {
           params: {
             key: "0f0ff16c99a94d289daf136852cd3b79", // Reemplaza con tu propia API key
-            page_size: 25, // Número de juegos a traer
+            page_size: 30, // Número de juegos a traer
           },
           mode: "no-cors",
         });
@@ -47,7 +72,6 @@ const Games = () => {
         );
       } catch (error) {
         console.error("Error al obtener los games:", error);
-
       }
     };
 
@@ -85,22 +109,21 @@ const Games = () => {
 
   return (
     <>
-    
-        <Snackbar
-          open={openAlert}
-          autoHideDuration={6000}
+      <Snackbar
+        open={openAlert}
+        autoHideDuration={6000}
+        onClose={() => setOpenAlert(false)}
+      >
+        <Alert
           onClose={() => setOpenAlert(false)}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
         >
-          <Alert
-            onClose={() => setOpenAlert(false)}
-            severity="success"
-            variant="filled"
-            sx={{ width: "100%" }}
-          >
-            Agregado Al Carrito Exitosamente
-          </Alert>
-        </Snackbar>
-  
+          Agregado Al Carrito Exitosamente
+        </Alert>
+      </Snackbar>
+
       <Header
         allProducts={allProducts}
         setAllProducts={setAllProducts}
@@ -109,29 +132,44 @@ const Games = () => {
         countProducts={countProducts}
         setCountProducts={setCountProducts}
       />
-<TextField
 
+      <Tabs
+        value={value}
+        onChange={handleChange}
+        variant="scrollable"
+        scrollButtons="auto"
+        sx={{
+          flexGrow: 1,
+          "& .MuiTabs-flexContainer": {
+            justifyContent: "center", // Centrar los tabs
+          },
+        }}
+      >
+        <Tab label="Accion" />
+        <Tab label="Shooter" />
+        <Tab label="Puzle" />
+        <Tab label="Supervivencia" />
+        <Tab label="RPG" />
+        <Tab label="Option 6" />
+      </Tabs>
+      <TextField
         label="Buscar juegos"
-       variant="outlined"
+        variant="outlined"
         fullWidth
         margin="normal"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-
       <Grid container spacing={2} sx={{ marginBottom: 5 }}>
-       {filteredGames.map((product, index) => (
-        
-       
+        {filteredGames.map((product, index) => (
           <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
-            
             <Paper elevation={3}>
-              <Card key={product.id} >
+              <Card key={product.id}>
                 <CardMedia
-                onClick={() =>{
-                  setOpenDialog(true);
-                  setGameSelect(product);
-                } }
+                  onClick={() => {
+                    setOpenDialog(true);
+                    setGameSelect(product);
+                  }}
                   component="img"
                   alt="green iguana"
                   height="240"
@@ -159,10 +197,13 @@ const Games = () => {
               </Card>
             </Paper>
           </Grid>
-
-          
         ))}
-        <Ventana openDialog={openDialog} closeDialog={closeDialog} product={gameSelect} />
+        <Ventana
+          openDialog={openDialog}
+          closeDialog={closeDialog}
+          product={gameSelect}
+          onAddProduct={onAddProduct}
+        />
       </Grid>
       <FooterPublic />
     </>

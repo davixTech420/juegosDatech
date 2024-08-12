@@ -5,6 +5,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { useNavigate } from 'react-router-dom';
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
@@ -25,6 +26,7 @@ export const Header = ({
   setTotal,
 }) => {
   const [active, setActive] = useState(false);
+  const navigate = useNavigate();
  
   const onDeleteProduct = (product) => {
     const results = allProducts.filter((item) => item.id !== product.id);
@@ -42,27 +44,24 @@ export const Header = ({
 
   return (
 <>
-
-<Box sx={{ position: 'relative', width: '100%',display:'flex',justifyContent:'space-between',alignItems:'center' }}>
+<Box sx={{
+  boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)', borderRadius:4,
+  position: 'relative', width: '100%',display:'flex',justifyContent:'space-between',alignItems:'center' }}>
 <Avatar
   alt="Remy Sharp"
   src="/static/images/avatar/1.jpg"
-  sx={{ width: 56, height: 56 }}
+  sx={{ width: 30, height: 30 }}
 />
       <Box
         sx={{ display: 'flex' }}
         onClick={() => setActive(!active)}
       >
-  
         <IconButton aria-label="cart">
           <Badge badgeContent={allProducts.length} color="secondary">
             <ShoppingCartIcon />
           </Badge>
         </IconButton>
-       
       </Box>
-
-     
       <Box
         sx={{
           display: active ? 'block' : 'none',
@@ -74,7 +73,8 @@ export const Header = ({
           overflowY: 'auto',
           bgcolor: 'background.paper',
           boxShadow: 3,
-          p: 2
+          p: 2,
+          zIndex:999
         }}
       >
         {allProducts.length ? (
@@ -107,9 +107,14 @@ export const Header = ({
               <Typography variant="h6">${total}</Typography>
             </Box>
 
-            <Button variant="contained" color="secondary" fullWidth onClick={onCleanCart}>
+            <Button  variant="contained" color="secondary" fullWidth onClick={onCleanCart}>
               Vaciar Carrito
             </Button>
+            
+            <Button sx={{ marginTop:2 }} variant="contained" color="secondary" fullWidth onClick={() => navigate('/Carrito')}>
+            Ver Carrito
+            </Button>
+            
           </>
         ) : (
           <Typography variant="body2">El carrito está vacío</Typography>
