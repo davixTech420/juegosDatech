@@ -51,6 +51,7 @@ export const Header = ({
   alt="Remy Sharp"
   src="/static/images/avatar/1.jpg"
   sx={{ width: 30, height: 30 }}
+  onClick={() => navigate("/Games")}
 />
       <Box
         sx={{ display: 'flex' }}
@@ -111,7 +112,7 @@ export const Header = ({
               Vaciar Carrito
             </Button>
             
-            <Button sx={{ marginTop:2 }} variant="contained" color="secondary" fullWidth onClick={() => navigate('/Carrito')}>
+            <Button sx={{ marginTop:2 }} variant="contained" color="secondary" fullWidth onClick={() => navigate('/cliente/carrito')}>
             Ver Carrito
             </Button>
             

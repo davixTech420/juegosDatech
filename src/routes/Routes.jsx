@@ -7,7 +7,7 @@ export function PublicRoutes() {
     return(
     <Routes>
         <Route path="/Games" element={<Games />}/>
-        <Route path="/Carrito" element={ <Carrito /> } />
+        
     </Routes>
     );
 }
@@ -15,6 +15,7 @@ export function ClienteRoutes() {
     return(
     <Routes>
         <Route path="dashboard" element={<div>hello world</div>}></Route>
+        <Route path="carrito" element={ <Carrito /> } />
     </Routes>
     );
     

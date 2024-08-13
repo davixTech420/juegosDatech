@@ -7,12 +7,10 @@ function App() {
 
 		<BrowserRouter>
 		<Routes>
-
 			<Route path="/" element={ < Navigate to="/Games"/>  }/>
 			<Route path='*' element={ <PublicRoutes/> }/>
 			<Route path='/cliente/*' element={ <ClienteRoutes/> }></Route>
 		</Routes>
-		
 		</BrowserRouter>
 		
 	);

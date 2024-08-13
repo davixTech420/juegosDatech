@@ -4,6 +4,7 @@ import FooterPublic from "../partials/FooterPublic";
 import Ventana from "./Ventana";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import axios from "axios";
+import gamesData from "../../datos/Games.json";
 import {
   Grid,
   Paper,
@@ -26,8 +27,10 @@ import {
 const Games = () => {
   /*este es el stado del juego seleccionado */
   const [gameSelect, setGameSelect] = useState(null);
+  /**este es el estado del juego mas vendido */
+  const [gameVendido, setGameVendido] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
-  const [games, setGames] = useState([]);
+  const [games, setGames] = useState(gamesData.games);
   const [openAlert, setOpenAlert] = useState(false);
   const [allProducts, setAllProducts] = useState([]);
   const [total, setTotal] = useState(0);
@@ -51,11 +54,32 @@ const Games = () => {
     );
   };
 
+
+
+  useEffect(() => {
+    const findBestSellingGame = () => {
+      if (games.length > 0) {
+        const bestGame = games.reduce((max, game) => (game.vendidas > max.vendidas ? game : max), games[0]);
+        setGameVendido(bestGame);
+      } else {
+        setGameVendido(null); // Manejar caso de array vacío
+      }
+    };
+
+    findBestSellingGame();
+  }, [games]);
+  console.log(gameVendido);
+
+
+
+
   useEffect(() => {
     saveCartToLocalStorage();
   }, [allProducts, total, countProducts]);
 
-  useEffect(() => {
+
+
+/*    useEffect(() => {
     const fetchGames = async () => {
       try {
         const response = await axios.get("https://api.rawg.io/api/games", {
@@ -76,7 +100,9 @@ const Games = () => {
     };
 
     fetchGames();
-  }, []);
+  }, []);  */
+
+
   useEffect(() => {
     setFilteredGames(
       games.filter((game) =>
@@ -141,9 +167,15 @@ const Games = () => {
         sx={{
           flexGrow: 1,
           "& .MuiTabs-flexContainer": {
-            justifyContent: "center", // Centrar los tabs
+              justifyContent: { xs: "start", sm: "center" }, // Centrar en pantallas más grandes
           },
-        }}
+          "& .MuiTabs-scrollButtons.Mui-disabled": {
+              opacity: 0.3, // Hacer visibles los botones de scroll aunque estén deshabilitados
+          },
+          "& .MuiTab-root": {
+              minWidth: { xs: 90, sm: 120 }, // Ajusta el ancho mínimo de los tabs
+          },
+      }}
       >
         <Tab label="Accion" />
         <Tab label="Shooter" />
@@ -152,7 +184,33 @@ const Games = () => {
         <Tab label="RPG" />
         <Tab label="Option 6" />
       </Tabs>
-      <TextField
+    
+
+ <center>  <h1>El Juego Mas Vendido</h1></center>
+<Card sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', p: 2, marginTop:4,marginBottom:2 }}>
+            <CardMedia
+                component="img"
+                sx={{  height: { xs: '100%', sm: 300 } , borderRadius: 2 }}
+                width={ { xs: 250, sm: 600 }  }
+                image={gameVendido?.background_image}
+                alt="Card Image"
+            />
+           
+                <CardActions sx={{ flexDirection: 'column' }}>
+
+                  <Typography>  {gameVendido?.name} </Typography>
+                  <Button size="full" onClick={() => onAddProduct(gameVendido)}>
+                    <AddShoppingCartIcon />
+            
+                  </Button>
+             
+            </CardActions>
+            
+         
+        </Card>
+
+        <TextField
+        sx={{ marginBottom: 4 }}
         label="Buscar juegos"
         variant="outlined"
         fullWidth
@@ -160,7 +218,19 @@ const Games = () => {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
+
+
       <Grid container spacing={2} sx={{ marginBottom: 5 }}>
+      
+
+
+
+
+
+
+
+
+
         {filteredGames.map((product, index) => (
           <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
             <Paper elevation={3}>
