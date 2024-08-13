@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Header } from "../../partials/Header";
 import FooterPublic from "../../partials/FooterPublic";
-import { Add, Remove } from '@mui/icons-material';
+import { Add, Remove } from "@mui/icons-material";
 import {
   Grid,
   Typography,
@@ -15,12 +15,48 @@ import {
   IconButton,
 } from "@mui/material";
 
-
 function Carrito() {
   const [allProducts, setAllProducts] = useState([]);
   const [total, setTotal] = useState(0);
   const [countProducts, setCountProducts] = useState(0);
+  const [categorias, setCategorias] = useState();
+
+   useEffect(() => {
+    switch (true) {
+      case categorias?.Puzzle >= 25:
+        setTotal(total *0.80 ); // 20% de descuento
+        break;
+      case categorias?.Deportes >= 20 && categorias?.Action >= 15:
+        setTotal(total*0.85) // 15% de descuento
+        break;
+      default:
+        console.log("Sin descuento"); // Sin descuento
+    }
+  }, [categorias]);
  
+  useEffect(() => {
+    const countCategories = () => {
+      const categoryCounts = allProducts.reduce((acc, product) => {
+        const categoryNames = Array.isArray(product.genres)
+          ? product.genres.map((genre) => genre.name)
+          : [product.genres.name];
+        categoryNames.forEach((name) => {
+          if (acc[name]) {
+            acc[name] += product.quantity;
+          } else {
+            acc[name] = product.quantity;
+          }
+        });
+        return acc;
+      }, {});
+      setCategorias(categoryCounts);
+      console.log("Conteo de Categorías:", categoryCounts);
+    };
+    if (allProducts.length > 0) {
+      countCategories();
+    }
+  }, [allProducts]);
+
   useEffect(() => {
     const cartFromStorage = localStorage.getItem("cart");
     if (cartFromStorage) {
@@ -31,42 +67,37 @@ function Carrito() {
     }
   }, []);
 
- 
   const updateCart = (updatedProducts) => {
-    const newTotal = updatedProducts.reduce((acc, product) => acc + product.metacritic * product.quantity, 0);
+    const newTotal = updatedProducts.reduce(
+      (acc, product) => acc + product.metacritic * product.quantity,
+      0
+    );
     const updatedCart = {
       allProducts: updatedProducts,
       total: newTotal,
-      countProducts: updatedProducts.reduce((acc, product) => acc + product.quantity, 0),
+      countProducts: updatedProducts.reduce(
+        (acc, product) => acc + product.quantity,
+        0
+      ),
     };
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
     setAllProducts(updatedProducts);
     setTotal(newTotal);
     setCountProducts(updatedCart.countProducts);
   };
- 
- /*  const updateCart = (updatedProducts) => {
-    const storedCart = JSON.parse(localStorage.getItem('cart'));
-    if (storedCart) {
-      const updatedCart = { ...storedCart, allProducts: updatedProducts };
-      localStorage.setItem('cart', JSON.stringify(updatedCart));
-      setAllProducts(updatedProducts);
-    }
-  } */
- 
 
- 
-   const handleAdd = (id) => {
+  const handleAdd = (id) => {
     const productIndex = allProducts.findIndex((product) => product.id === id);
     if (productIndex !== -1) {
-      const updatedProduct = { ...allProducts[productIndex], quantity: allProducts[productIndex].quantity + 1 };
+      const updatedProduct = {
+        ...allProducts[productIndex],
+        quantity: allProducts[productIndex].quantity + 1,
+      };
       const updatedAllProducts = [...allProducts];
       updatedAllProducts[productIndex] = updatedProduct;
       updateCart(updatedAllProducts);
-      
     }
-  }; 
-  
+  };
 
   const handleRemove = (id) => {
     const productIndex = allProducts.findIndex((product) => product.id === id);
@@ -80,7 +111,7 @@ function Carrito() {
       updateCart(updatedAllProducts);
     }
   };
-  
+
   return (
     <>
       <Header
@@ -93,80 +124,68 @@ function Carrito() {
       />
       <Box sx={{ flexGrow: 1, padding: 2, marginBottom: 10 }}>
         <Grid container spacing={2}>
+
           {/* Main Content Grid (70% Width) */}
           <Grid item xs={12} sm={8} md={7} sx={{ mb: 2, marginTop: 2 }}>
             <Paper elevation={3} sx={{ padding: 2, height: "100%" }}>
-              {allProducts.map((product) => (
+              {allProducts.length == 0 ?
+              <Typography
+              variant="h5"
+              sx={{ mx: 2, minWidth: "30px", textAlign: "center",alignItems: "center" }}
+            >
+             El Carrito Esta Vacio
+            </Typography> 
+             : allProducts.map((product) => (
                 <Card
-                key={product.id}
-
                   sx={{
                     display: "flex",
-                    flexDirection: "row",
-                    maxWidth: "100%",
-                    marginTop: 2,
+                    justifyContent: "space-around",
+                    flexDirection: { xs: "column", sm: "row" },
+                    alignItems: "center",
+                    p: 2,
+                    marginTop: 4,
+                    marginBottom: 2,
                   }}
                 >
+                  <Typography> {product.name} </Typography>
                   <CardMedia
                     component="img"
-                    image={product.background_image}
-                    alt="Game Image"
                     sx={{
-                      borderRadius: 3,
-                      width: { xs: 150, sm: 200 },
-                      height: { xs: 250, sm: "auto" },
-                      objectFit: "cover",
+                      borderRadius: 2,
+                      display: "flex",
+                      height: { xs: 200, sm: 200 },
+                      width: { xs: 250, sm: 150 },
                     }}
+                    image={product.background_image}
+                    alt="Card Image"
                   />
-                  <Box sx={{ display: "flex", flexDirection: "row", flex: 1 }}>
-                    <Box sx={{ flex: 1, padding: 2 }}>
-                      <CardContent>
-                        <Typography variant="h6" component="div">
-                          {product.name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          sadsad
-                        </Typography>
-                      </CardContent>
-                      <CardActions
-                        sx={{ display: "flex", justifyContent: "space-around" }}
-                      >
-<Box 
-      sx={{
-        display: 'flex', 
-        alignItems: 'center',
-        justifyContent: 'center',
-        maxWidth: '150px',
-        mx: 'auto',
-        border: '1px solid #ccc',
-        borderRadius: '8px',
-        p: 1
-      }}
-    >
-      <IconButton onClick={() => handleRemove(product.id)} aria-label="reduce">
-        <Remove />
-      </IconButton>
-      <Typography 
-        variant="body1" 
-        sx={{ mx: 2, minWidth: '30px', textAlign: 'center' }}
-      >
-        {product.quantity}
-      </Typography>
-      <IconButton onClick={() => handleAdd(product.id)} aria-label="increase">
-        <Add />
-      </IconButton>
-    </Box>
 
+                  <CardActions sx={{ flexDirection: "row" }}>
+                    <IconButton
+                      onClick={() => handleRemove(product.id)}
+                      aria-label="reduce"
+                    >
+                      <Remove />
+                    </IconButton>
+                    <Typography
+                      variant="body1"
+                      sx={{ mx: 2, minWidth: "30px", textAlign: "center" }}
+                    >
+                      {product.quantity}
+                    </Typography>
+                    <IconButton
+                      onClick={() => handleAdd(product.id)}
+                      aria-label="increase"
+                      sx={{ left: -6 }}
+                    >
+                      <Add />
+                    </IconButton>
 
-
-
-
-
-                        <Button size="small">Buy Now</Button>
-                        <Button size="small">Learn More</Button>
-                      </CardActions>
-                    </Box>
-                  </Box>
+                    <Typography>
+                      {" "}
+                      ${product.quantity * product.metacritic}{" "}
+                    </Typography>
+                  </CardActions>
                 </Card>
               ))}
             </Paper>
@@ -179,37 +198,41 @@ function Carrito() {
               sx={{ padding: 2, height: "100%", marginTop: 2 }}
             >
               <Typography variant="h4" gutterBottom>
-                Sidebar
+                SubTotal
               </Typography>
               <Card sx={{ minWidth: 275 }}>
-      <CardContent>
-        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-          Word of the Day
-        </Typography>
-        <Typography variant="h5" component="div">
-        
-        </Typography>
-        <Typography sx={{ mb: 1.5 }} color="text.secondary">
-          adjective
-        </Typography>
-        <Typography variant="body2">
-          well meaning and kindly.
-          <br />
-         
-        </Typography>
-      </CardContent>
-      <CardActions>
-        <Button size="small">Learn More</Button>
-      </CardActions>
-    </Card>
-
-
-
-
-
-
-
-
+                <CardContent>
+                  <Typography variant="h5" component="div"></Typography>
+                  <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                    Articulos({" "}
+                    {allProducts.reduce(
+                      (acc, product) => acc + product.quantity,
+                      0
+                    )}{" "}
+                    )
+                  </Typography>
+                  <Typography variant="body2">
+                    Descuento De : 
+                     { categorias?.Puzzle >= 25 ? '20%' : categorias?.Deportes >= 20 && categorias?.Action >= 15   ? '15%' : '0%' }
+                    <br />
+                  </Typography>
+                  <br />
+                  <Typography variant="h4" gutterBottom>
+                    SubTotal : {categorias ? total : 0}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    fullWidth
+                    sx={{
+                      background: "black",
+                      color: "white",
+                    }}
+                  >
+                    Completar La Transaccion
+                  </Button>
+                </CardActions>
+              </Card>
             </Paper>
           </Grid>
         </Grid>

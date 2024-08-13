@@ -1,10 +1,11 @@
 import { useState } from "react";
 import Badge from "@mui/material/Badge";
-import { Box,Typography ,Avatar,Button ,Divider} from "@mui/material";
+import { Box,Typography ,Avatar,Button ,Divider,Menu,MenuItem} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import AccountCircle from '@mui/icons-material/AccountCircle';
 import { useNavigate } from 'react-router-dom';
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -25,6 +26,8 @@ export const Header = ({
   setCountProducts,
   setTotal,
 }) => {
+
+  const [openProfile ,setOpenProfile] = useState(false);
   const [active, setActive] = useState(false);
   const navigate = useNavigate();
  
@@ -47,6 +50,14 @@ export const Header = ({
 <Box sx={{
   boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)', borderRadius:4,
   position: 'relative', width: '100%',display:'flex',justifyContent:'space-between',alignItems:'center' }}>
+
+
+
+
+
+
+
+
 <Avatar
   alt="Remy Sharp"
   src="/static/images/avatar/1.jpg"
@@ -63,6 +74,36 @@ export const Header = ({
           </Badge>
         </IconButton>
       </Box>
+      <div>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+               onClick={() => setOpenProfile(true)}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+             
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={openProfile}
+               onClose={() => setOpenProfile(false)}
+              >
+                <MenuItem onClick={() => navigate("/Registrar")} >Registrar</MenuItem>
+                <MenuItem onClick={() => navigate("/Login")} >Login</MenuItem>
+              </Menu>
+            </div>
       <Box
         sx={{
           display: active ? 'block' : 'none',

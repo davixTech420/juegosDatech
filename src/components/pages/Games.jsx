@@ -17,9 +17,6 @@ import {
   TextField,
   Alert,
   Snackbar,
-  AppBar,
-  Toolbar,
-  Box,
   Tabs,
   Tab,
 } from "@mui/material";
@@ -68,9 +65,7 @@ const Games = () => {
 
     findBestSellingGame();
   }, [games]);
-  console.log(gameVendido);
-
-
+  
 
 
   useEffect(() => {
@@ -222,15 +217,6 @@ const Games = () => {
 
       <Grid container spacing={2} sx={{ marginBottom: 5 }}>
       
-
-
-
-
-
-
-
-
-
         {filteredGames.map((product, index) => (
           <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
             <Paper elevation={3}>
