@@ -177,7 +177,7 @@ const Games = () => {
         <Tab label="Puzle" />
         <Tab label="Supervivencia" />
         <Tab label="RPG" />
-        <Tab label="Option 6" />
+        <Tab label="Deportes" />
       </Tabs>
     
 
@@ -213,10 +213,7 @@ const Games = () => {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-
-
       <Grid container spacing={2} sx={{ marginBottom: 5 }}>
-      
         {filteredGames.map((product, index) => (
           <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
             <Paper elevation={3}>

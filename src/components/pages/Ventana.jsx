@@ -55,6 +55,19 @@ export default function Ventana({ openDialog, closeDialog, product, onAddProduct
       {platformData.platform.name}
     </Typography>
   ))}
+
+<center><h1>Detalles</h1></center>
+<Typography variant="body" component="div">
+                    Peso:  {product.peso}
+                    </Typography>
+
+
+  <Typography variant="body" component="div">
+                    Unidades Disponibles:  {product.stock}
+                    </Typography>
+                    <Typography variant="body" component="div">
+                    Unidades Vendidas:  {product.vendidas}
+                    </Typography>
                 </Box>
               </CardContent>
             </Card>
@@ -63,7 +76,7 @@ export default function Ventana({ openDialog, closeDialog, product, onAddProduct
       </DialogContent>
       <DialogActions sx={{ display:'flex',  justifyContent:'space-around' }} >
         <Button onClick={closeDialog} sx={{ color:'red' }}>  < CloseIcon/>  </Button>
-        <Button type="submit" onClick={() => onAddProduct(product)}><AddShoppingCartIcon/></Button>
+        <Button type="submit" onClick={() => onAddProduct(product)}><AddShoppingCartIcon/>  ${product.metacritic}  </Button>
       </DialogActions>
     </Dialog>
   );

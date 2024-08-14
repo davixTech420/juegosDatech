@@ -112,6 +112,19 @@ function Carrito() {
     }
   };
 
+
+  const enviarWhatsApp = (carrito) => {
+    /* const productos = carrito.map(producto => `${producto.nombre} - Cantidad: ${producto.cantidad}`).join('%0A');
+    const mensaje = `Me%20interesan%20los%20siguientes%20productos:%0A${productos}`; */
+    const productos = carrito.map((producto) => {
+      const totalProducto = producto.quantity * producto.metacritic;
+      return `Juego: ${producto.name}%0ACantidad: ${producto.quantity}%0APrecio por unidad: $${producto.metacritic}%0ATotal por este juego: $${totalProducto}%0AClave del juego:%0A------------------------`;
+    }).join('%0A');
+    const mensaje = `Me%20interesan%20los%20siguientes%20productos:%0A${productos}%0AValor%20total%20a%20pagar:%20$${total}`;
+    const numeroTelefono = "+573242855700"; // Reemplaza con el número de destinatario
+    window.open(`https://api.whatsapp.com/send?phone=${numeroTelefono}&text=${mensaje}`);
+  };
+
   return (
     <>
       <Header
@@ -200,7 +213,7 @@ function Carrito() {
               <Typography variant="h4" gutterBottom>
                 SubTotal
               </Typography>
-              <Card sx={{ minWidth: 275 }}>
+              <Card sx={{ }}>
                 <CardContent>
                   <Typography variant="h5" component="div"></Typography>
                   <Typography sx={{ mb: 1.5 }} color="text.secondary">
@@ -228,6 +241,7 @@ function Carrito() {
                       background: "black",
                       color: "white",
                     }}
+                    onClick={() => enviarWhatsApp(allProducts)}
                   >
                     Completar La Transaccion
                   </Button>

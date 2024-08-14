@@ -12,7 +12,9 @@ function Registrar() {
   const [data, setData] = useState({
     email: "",
     password: "",
-  })
+    comprados:0,
+    vendidos:[]
+  });
 
 
 
