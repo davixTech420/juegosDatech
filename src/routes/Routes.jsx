@@ -4,6 +4,7 @@ import Games from "../components/pages/Games";
 import Carrito from "../components/pages/cliente/Carrito";
 import Registrar from "../components/pages/auth/Registrar";
 import Login from "../components/pages/auth/Login";
+import  Dashboard from "../components/pages/cliente/Dahsboard";
 
 export function PublicRoutes() {
     return(
@@ -17,7 +18,7 @@ export function PublicRoutes() {
 export function ClienteRoutes() {
     return(
     <Routes>
-        <Route path="dashboard" element={<div>hello world</div>}></Route>
+        <Route path="dashboard" element={<Dashboard/>}></Route>
         <Route path="carrito" element={ <Carrito /> } />
     </Routes>
     );

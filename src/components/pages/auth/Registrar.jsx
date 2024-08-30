@@ -1,9 +1,9 @@
 import { useState} from 'react'
 import { Header } from '../../partials/Header'
 import FooterPublic from '../../partials/FooterPublic'
-import { Container, Box, Avatar,Typography,TextField,Button } from '@mui/material';
+import { Container, Box, Avatar,Typography,TextField,Button, Alert } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { Try } from '@mui/icons-material';
+import { registrarUser } from '../../../services/servicios';
 
 function Registrar() {
     const [allProducts, setAllProducts] = useState([]);
@@ -12,17 +12,13 @@ function Registrar() {
   const [data, setData] = useState({
     email: "",
     password: "",
-    comprados:0,
-    vendidos:[]
   });
 
 
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    
-
+    const enviarData = await registrarUser(data);
+    enviarData.status ? window.location.href="login" : console.log("Error");
     }
   return (
 <>
@@ -51,7 +47,7 @@ function Registrar() {
           <Typography component="h1" variant="h5">
             Crear Cuenta
           </Typography>
-          <Box component="form" noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"
               required
@@ -82,8 +78,9 @@ function Registrar() {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
+              onSubmit={handleSubmit}
             >
-              Sign In
+              Crear Cuenta
             </Button>
             
           </Box>

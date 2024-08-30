@@ -5,6 +5,7 @@ import Ventana from "./Ventana";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import axios from "axios";
 import gamesData from "../../datos/Games.json";
+import { getGames } from "../../services/servicios";
 import {
   Grid,
   Paper,
@@ -52,6 +53,21 @@ const Games = () => {
   };
 
 
+  
+useEffect(() => {
+  const fetchGames = async () => {
+    try {
+      const response = await getGames();
+      
+      setGames([...games, ...response.data]);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  fetchGames();
+
+},[])
+
 
   useEffect(() => {
     const findBestSellingGame = () => {
@@ -74,28 +90,6 @@ const Games = () => {
 
 
 
-/*    useEffect(() => {
-    const fetchGames = async () => {
-      try {
-        const response = await axios.get("https://api.rawg.io/api/games", {
-          params: {
-            key: "0f0ff16c99a94d289daf136852cd3b79", // Reemplaza con tu propia API key
-            page_size: 30, // Número de juegos a traer
-          },
-          mode: "no-cors",
-        });
-        console.log(response.data.results);
-
-        setGames(
-          response.data.results.map((game) => ({ ...game, quantity: 1 }))
-        );
-      } catch (error) {
-        console.error("Error al obtener los games:", error);
-      }
-    };
-
-    fetchGames();
-  }, []);  */
 
 
   useEffect(() => {
@@ -179,8 +173,7 @@ const Games = () => {
         <Tab label="RPG" />
         <Tab label="Deportes" />
       </Tabs>
-    
-
+  
  <center>  <h1>El Juego Mas Vendido</h1></center>
 <Card sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', p: 2, marginTop:4,marginBottom:2 }}>
             <CardMedia
@@ -203,7 +196,6 @@ const Games = () => {
             
          
         </Card>
-
         <TextField
         sx={{ marginBottom: 4 }}
         label="Buscar juegos"
