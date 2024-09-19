@@ -1,4 +1,4 @@
-import { useState} from 'react'
+import { useState, useEffect} from 'react'
 import { Header } from '../../partials/Header'
 import FooterPublic from '../../partials/FooterPublic'
 import { Container, Box, Avatar,Typography,TextField,Button, Alert } from '@mui/material';
@@ -13,6 +13,14 @@ function Registrar() {
     email: "",
     password: "",
   });
+  const [logueado ,setLogueado] = useState(localStorage.getItem('logueado'));
+
+
+  useEffect(() => {
+    if (logueado) {
+     window.location.href = "/cliente/dashboard";
+    }
+}, []);
 
 
 

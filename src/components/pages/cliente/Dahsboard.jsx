@@ -11,7 +11,6 @@ import {
   ListItemText,
   Container,
   Grid,
-  Paper,
   Card,
   CardContent,
   CardMedia,
@@ -19,17 +18,17 @@ import {
   useTheme,
   useMediaQuery,
   Box,
-  LinearProgress,
   TextField,
- Chip,
-  MenuItem,
+  Chip,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   CardActionArea,
 } from '@mui/material';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import {
+  Delete as DeleteIcon,
   Menu as MenuIcon,
   Dashboard as DashboardIcon,
   ShoppingCart as ShoppingCartIcon,
@@ -37,18 +36,18 @@ import {
   AddCircle as AddCircleIcon,
   Image as ImageIcon,
 } from '@mui/icons-material';
-import { getGamesVendedor, venderGame } from '../../../services/servicios';
+import { eliminarGame, getGamesVendedor, venderGame } from '../../../services/servicios';
 
 const drawerWidth = 240;
 
- const salesData = [
+const salesData = [
   { month: 'Ene', sales: 4000 },
   { month: 'Feb', sales: 3000 },
   { month: 'Mar', sales: 5000 },
   { month: 'Abr', sales: 4500 },
   { month: 'May', sales: 6000 },
   { month: 'Jun', sales: 5500 },
-]; 
+];
 
 // Datos de ejemplo para los juegos creados
 const createdGames = [
@@ -67,19 +66,24 @@ export default function Component() {
   const [currentView, setCurrentView] = useState('dashboard');
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-const [misGames ,setMisGames] = useState({});
+  const [misGames, setMisGames] = useState({});
+  const [logueado,setLogueado] = useState(localStorage.getItem('logueado'));
 
 
-useEffect(() =>{
+  useEffect(() => {
+    if (!logueado) {
+      window.location.href = "/login";
+    }
 
- const misjuegos = async () => {
-const respon = await getGamesVendedor(JSON.parse(localStorage.getItem('logueado')).id);
-console.log(respon.data);
-setMisGames(respon.data);
-console.log(misGames);
- }
-misjuegos();
-},[]);
+
+    const misjuegos = async () => {
+      const respon = await getGamesVendedor(JSON.parse(localStorage.getItem('logueado')).id);
+      console.log(respon.data);
+      setMisGames(respon.data);
+      console.log(misGames);
+    }
+    misjuegos();
+  }, []);
 
 
 
@@ -120,28 +124,33 @@ misjuegos();
       <Toolbar />
       <List>
         {[
-          { text: 'Ventas', icon: <ShoppingCartIcon />, view: 'sales' },
+          { text: 'Juegos', icon: <ShoppingCartIcon />, view: 'sales' },
           { text: 'Crear Juego', icon: <AddCircleIcon />, view: 'create' },
         ].map((item) => (
-          <ListItem 
-            button 
-            key={item.text} 
+          <ListItem
+            button
+            key={item.text}
             onClick={() => item.view === 'create' ? handleOpenDialog() : handleViewChange(item.view)}
           >
             <ListItemIcon>{item.icon}</ListItemIcon>
             <ListItemText primary={item.text} />
           </ListItem>
+
         ))}
+        <ListItem sx={{ marginTop:{ xs:0 , sm: 50}  }}  onClick={() =>{localStorage.removeItem('logueado'); window.location.href="/";   }  }>
+          <ListItemIcon><ExitToAppIcon color="error" /></ListItemIcon>
+          <ListItemText variant="contained" color="error"  primary={"salir"} />
+        </ListItem>
       </List>
     </div>
   );
 
- 
+
   const renderSalesContent = () => (
     <Grid container spacing={3}>
       {misGames.map((game) => (
         <Grid item key={game.id} xs={12} sm={6} md={4}>
-          <Card>
+          <Card sx={{ boxShadow: "4px 4px 7px rgba(0, 0, 0, 0.3)" }}>
             <CardActionArea>
               <CardMedia
                 component="img"
@@ -153,8 +162,8 @@ misjuegos();
                 <Typography gutterBottom variant="h6" component="div" noWrap>
                   {game.name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  ${game.matacritic}
+                <Typography variant="body2" color="text.secondary" sx={{ justifyContent: 'space-between', display: 'flex' }} >
+                  ${game.metacritic}  <Button onClick={() => eliminarGame(game.id) && window.location.reload()}><DeleteIcon color="error" /></Button>
                 </Typography>
               </CardContent>
             </CardActionArea>
@@ -163,14 +172,8 @@ misjuegos();
       ))}
     </Grid>
   );
-
-
-
-
-
-
   const [formData, setFormData] = useState({
-    sellerId : JSON.parse(localStorage.getItem('logueado')).id,
+    sellerId: JSON.parse(localStorage.getItem('logueado')).id,
     name: '',
     peso: '',
     stock: 0,
@@ -180,12 +183,12 @@ misjuegos();
     metacritic: 0,
     released: '',
     genres: [
-      
+
       {
-      name: '',
-      slug: ''
-    }
-  ],
+        name: '',
+        slug: ''
+      }
+    ],
     platforms: [{
       platform: {
         name: '',
@@ -241,10 +244,11 @@ misjuegos();
 
 
 
-  
+
 
   return (
     <Box sx={{ display: 'flex' }}>
+      
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
           <IconButton
@@ -257,7 +261,7 @@ misjuegos();
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Dashboard de Juegos
+            Mis Juegos
           </Typography>
         </Toolbar>
       </AppBar>
@@ -278,7 +282,7 @@ misjuegos();
       </Drawer>
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4, flexGrow: 1, p: 3 }}>
         <Toolbar />
-       
+
         {currentView === 'sales' && renderSalesContent()}
       </Container>
 
@@ -298,261 +302,148 @@ misjuegos();
 
 
 
-        <form onSubmit={handleSubmit}>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Nombre del Juego"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Peso (GB)"
-              name="peso"
-              value={formData.peso}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Stock"
-              name="stock"
-              type="number"
-              value={formData.stock}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Vendidas"
-              name="vendidas"
-              type="number"
-              value={formData.vendidas}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Cantidad"
-              name="quantity"
-              type="number"
-              value={formData.quantity}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="URL de la Imagen"
-              name="background_image"
-              value={formData.background_image}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Metacritic"
-              name="metacritic"
-              type="number"
-              value={formData.metacritic}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Fecha de Lanzamiento"
-              name="released"
-              type="date"
-              value={formData.released}
-              onChange={handleChange}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              required
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Añadir Género"
-              value={genreInput}
-              onChange={(e) => setGenreInput(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleGenreAdd();
-                }
-              }}
-            />
-            <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-              {formData.genres.map((genre, index) => (
-                <Chip 
-                  key={index} 
-                  label={genre.name} 
-                  onDelete={() => {
-                    setFormData(prevData => ({
-                      ...prevData,
-                      genres: prevData.genres.filter((_, i) => i !== index),
-                    }));
-                  }} 
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Nombre del Juego"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
                 />
-              ))}
-            </Box>
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Añadir Plataforma"
-              value={platformInput}
-              onChange={(e) => setPlatformInput(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handlePlatformAdd();
-                }
-              }}
-            />
-            <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-              {formData.platforms.map((platform, index) => (
-                <Chip 
-                  key={index} 
-                  label={platform.platform.name} 
-                  onDelete={() => {
-                    setFormData(prevData => ({
-                      ...prevData,
-                      platforms: prevData.platforms.filter((_, i) => i !== index),
-                    }));
-                  }} 
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Peso (GB)"
+                  name="peso"
+                  value={formData.peso}
+                  onChange={handleChange}
+                  required
                 />
-              ))}
-            </Box>
-          </Grid>
-          <Grid item xs={12}>
-            <Button type="submit" variant="contained" color="primary" fullWidth>
-              Añadir Juego
-            </Button>
-          </Grid>
-        </Grid>
-      </form>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-          {/* <Box component="form" noValidate sx={{ mt: 1 }}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="gameName"
-              label="Nombre del Juego"
-              name="gameName"
-              autoFocus
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="gameDescription"
-              label="Descripción del Juego"
-              name="gameDescription"
-              multiline
-              rows={4}
-            />
-            <FormControl fullWidth margin="normal">
-              <InputLabel id="gameGenre-label">Género</InputLabel>
-              <Select
-                labelId="gameGenre-label"
-                id="gameGenre"
-                label="Género"
-              >
-                <MenuItem value="action">Acción</MenuItem>
-                <MenuItem value="adventure">Aventura</MenuItem>
-                <MenuItem value="rpg">RPG</MenuItem>
-                <MenuItem value="strategy">Estrategia</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="gamePrice"
-              label="Precio"
-              name="gamePrice"
-              type="number"
-            />
-            <Button
-              variant="contained"
-              component="label"
-              startIcon={<ImageIcon />}
-              sx={{ mt: 2, mb: 2 }}
-            >
-              Subir Imagen
-              <input
-                type="file"
-                hidden
-                accept="image/*"
-                onChange={handleImageUpload}
-              />
-            </Button>
-            {imageUrl && (
-              <Box mt={2}>
-                <Typography variant="subtitle1" gutterBottom>
-                  Vista previa de la imagen:
-                </Typography>
-                <img src={imageUrl} alt="Vista previa" style={{ maxWidth: '100%', maxHeight: '200px' }} />
-                <Typography variant="body2" sx={{ wordBreak: 'break-all' }}>
-                  URL de la imagen: {imageUrl}
-                </Typography>
-              </Box>
-            )}
-          </Box> */}
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Stock"
+                  name="stock"
+                  type="number"
+                  value={formData.stock}
+                  onChange={handleChange}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Cantidad"
+                  name="quantity"
+                  type="number"
+                  value={formData.quantity}
+                  onChange={handleChange}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="URL de la Imagen"
+                  name="background_image"
+                  value={formData.background_image}
+                  onChange={handleChange}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Metacritic"
+                  name="metacritic"
+                  type="number"
+                  value={formData.metacritic}
+                  onChange={handleChange}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Fecha de Lanzamiento"
+                  name="released"
+                  type="date"
+                  value={formData.released}
+                  onChange={handleChange}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Añadir Género"
+                  value={genreInput}
+                  onChange={(e) => setGenreInput(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleGenreAdd();
+                    }
+                  }}
+                />
+                <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  {formData.genres.map((genre, index) => (
+                    <Chip
+                      key={index}
+                      label={genre.name}
+                      onDelete={() => {
+                        setFormData(prevData => ({
+                          ...prevData,
+                          genres: prevData.genres.filter((_, i) => i !== index),
+                        }));
+                      }}
+                    />
+                  ))}
+                </Box>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Añadir Plataforma"
+                  value={platformInput}
+                  onChange={(e) => setPlatformInput(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handlePlatformAdd();
+                    }
+                  }}
+                />
+                <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  {formData.platforms.map((platform, index) => (
+                    <Chip
+                      key={index}
+                      label={platform.platform.name}
+                      onDelete={() => {
+                        setFormData(prevData => ({
+                          ...prevData,
+                          platforms: prevData.platforms.filter((_, i) => i !== index),
+                        }));
+                      }}
+                    />
+                  ))}
+                </Box>
+              </Grid>
+              <Grid item xs={12}>
+                <Button type="submit" variant="contained" color="primary" fullWidth>
+                  Añadir Juego
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Cancelar</Button>

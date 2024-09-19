@@ -13,13 +13,19 @@ import {
   CardActions,
   Button,
   IconButton,
+  Snackbar,
+  Alert
 } from "@mui/material";
-
+import { actualizarGame } from "../../../services/servicios";
 function Carrito() {
   const [allProducts, setAllProducts] = useState([]);
   const [total, setTotal] = useState(0);
   const [countProducts, setCountProducts] = useState(0);
   const [categorias, setCategorias] = useState();
+  const [logueado ,setLogueado] = useState(localStorage.getItem('logueado'));
+const [openError,setOpenError] = useState(false);
+
+
 
    useEffect(() => {
     switch (true) {
@@ -114,10 +120,37 @@ function Carrito() {
 
 
   const enviarWhatsApp = (carrito) => {
-    /* const productos = carrito.map(producto => `${producto.nombre} - Cantidad: ${producto.cantidad}`).join('%0A');
-    const mensaje = `Me%20interesan%20los%20siguientes%20productos:%0A${productos}`; */
+    if(!logueado){
+      return setOpenError(true);
+    }
     const productos = carrito.map((producto) => {
-      const totalProducto = producto.quantity * producto.metacritic;
+
+
+
+
+
+
+
+        // Preparar datos para actualizar el producto
+         const formData = {
+          stock: producto.stock - producto.quantity,
+          vendidas:producto.vendidas + producto.quantity
+      };
+
+      // Actualizar el producto en la API
+      actualizarGame(producto.id, formData)
+          .then(response => {
+              console.log(`Producto ${producto.name} actualizado exitosamente`, response.data);
+          })
+          .catch(error => {
+              console.error(`Error actualizando el producto ${producto.name}:`, error);
+          });
+
+
+
+
+
+      const totalProducto = producto.quantity * producto.metacritic; 
       return `Juego: ${producto.name}%0ACantidad: ${producto.quantity}%0APrecio por unidad: $${producto.metacritic}%0ATotal por este juego: $${totalProducto}%0AClave del juego:%0A------------------------`;
     }).join('%0A');
     const mensaje = `Me%20interesan%20los%20siguientes%20productos:%0A${productos}%0AValor%20total%20a%20pagar:%20$${total}`;
@@ -127,6 +160,20 @@ function Carrito() {
 
   return (
     <>
+      <Snackbar
+        open={openError}
+        autoHideDuration={6000}
+        onClose={() => setOpenError(false)}
+      >
+        <Alert
+          onClose={() => setOpenError(false)}
+          severity="error"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          Inicia Secion
+        </Alert>
+      </Snackbar>
       <Header
         allProducts={allProducts}
         setAllProducts={setAllProducts}
@@ -195,8 +242,9 @@ function Carrito() {
                     </IconButton>
 
                     <Typography>
-                      {" "}
-                      ${product.quantity * product.metacritic}{" "}
+                      x Unidad : ${product.metacritic}
+                      {"\n"}
+                       Total :  ${product.quantity * product.metacritic}{" "}
                     </Typography>
                   </CardActions>
                 </Card>

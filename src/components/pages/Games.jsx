@@ -36,7 +36,10 @@ const Games = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredGames, setFilteredGames] = useState([]);
   const [value, setValue] = useState(0);
+  const [activeGenre, setActiveGenre] = useState('All')
 
+
+  const genres = ['All', 'Action', 'Shooter', 'Puzzle', 'Survival', 'RPG', 'Sports'];
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -53,20 +56,20 @@ const Games = () => {
   };
 
 
-  
-useEffect(() => {
-  const fetchGames = async () => {
-    try {
-      const response = await getGames();
-      
-      setGames([...games, ...response.data]);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  fetchGames();
 
-},[])
+  useEffect(() => {
+    const fetchGames = async () => {
+      try {
+        const response = await getGames();
+
+        setGames([...games, ...response.data]);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchGames();
+
+  }, [])
 
 
   useEffect(() => {
@@ -75,13 +78,13 @@ useEffect(() => {
         const bestGame = games.reduce((max, game) => (game.vendidas > max.vendidas ? game : max), games[0]);
         setGameVendido(bestGame);
       } else {
-        setGameVendido(null); // Manejar caso de array vacío
+        setGameVendido(null);
       }
     };
 
     findBestSellingGame();
   }, [games]);
-  
+
 
 
   useEffect(() => {
@@ -89,16 +92,17 @@ useEffect(() => {
   }, [allProducts, total, countProducts]);
 
 
-
-
-
-  useEffect(() => {
+ 
+  
+   useEffect(() => {
     setFilteredGames(
-      games.filter((game) =>
-        game.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+        games?.filter((game) => 
+            (activeGenre === 'All' || (game?.genres && game.genres?.some(genre => genre.name === activeGenre))) &&
+            game.name?.toLowerCase().includes(searchTerm?.toLowerCase())
+        )
     );
-  }, [searchTerm, games]);
+}, [searchTerm, activeGenre, games]); 
+ 
 
   const onAddProduct = (product) => {
     if (product.quantity > 0) {
@@ -148,7 +152,7 @@ useEffect(() => {
         setCountProducts={setCountProducts}
       />
 
-      <Tabs
+      {/* <Tabs
         value={value}
         onChange={handleChange}
         variant="scrollable"
@@ -156,15 +160,15 @@ useEffect(() => {
         sx={{
           flexGrow: 1,
           "& .MuiTabs-flexContainer": {
-              justifyContent: { xs: "start", sm: "center" }, // Centrar en pantallas más grandes
+            justifyContent: { xs: "start", sm: "center" }, // Centrar en pantallas más grandes
           },
           "& .MuiTabs-scrollButtons.Mui-disabled": {
-              opacity: 0.3, // Hacer visibles los botones de scroll aunque estén deshabilitados
+            opacity: 0.3, // Hacer visibles los botones de scroll aunque estén deshabilitados
           },
           "& .MuiTab-root": {
-              minWidth: { xs: 90, sm: 120 }, // Ajusta el ancho mínimo de los tabs
+            minWidth: { xs: 90, sm: 120 }, // Ajusta el ancho mínimo de los tabs
           },
-      }}
+        }}
       >
         <Tab label="Accion" />
         <Tab label="Shooter" />
@@ -172,31 +176,53 @@ useEffect(() => {
         <Tab label="Supervivencia" />
         <Tab label="RPG" />
         <Tab label="Deportes" />
+      </Tabs> */}
+      <Tabs
+        value={activeGenre}
+        onChange={(event, newValue) => setActiveGenre(newValue)}
+        variant="scrollable"
+        scrollButtons="auto"
+        sx={{
+          flexGrow: 1,
+          "& .MuiTabs-flexContainer": {
+            justifyContent: { xs: "start", sm: "center" },
+          },
+          "& .MuiTabs-scrollButtons.Mui-disabled": {
+            opacity: 0.3,
+          },
+          "& .MuiTab-root": {
+            minWidth: { xs: 90, sm: 120 },
+          },
+        }}
+      >
+        {genres.map((genre) => (
+          <Tab key={genre} label={genre} value={genre} />
+        ))}
       </Tabs>
-  
- <center>  <h1>El Juego Mas Vendido</h1></center>
-<Card sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', p: 2, marginTop:4,marginBottom:2 }}>
-            <CardMedia
-                component="img"
-                sx={{  height: { xs: '100%', sm: 300 } , borderRadius: 2 }}
-                width={ { xs: 250, sm: 600 }  }
-                image={gameVendido?.background_image}
-                alt="Card Image"
-            />
-           
-                <CardActions sx={{ flexDirection: 'column' }}>
 
-                  <Typography>  {gameVendido?.name} </Typography>
-                  <Button size="full" onClick={() => onAddProduct(gameVendido)}>
-                    <AddShoppingCartIcon />
-            
-                  </Button>
-             
-            </CardActions>
-            
-         
-        </Card>
-        <TextField
+      <center>  <h1>El Juego Mas Vendido</h1></center>
+      <Card sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', p: 2, marginTop: 4, marginBottom: 2 }}>
+        <CardMedia
+          component="img"
+          sx={{ height: { xs: '100%', sm: 300 }, borderRadius: 2 }}
+          width={{ xs: 250, sm: 600 }}
+          image={gameVendido?.background_image}
+          alt="Card Image"
+        />
+
+        <CardActions sx={{ flexDirection: 'column' }}>
+
+          <Typography>  {gameVendido?.name} </Typography>
+          <Button size="full" onClick={() => onAddProduct(gameVendido)}>
+            <AddShoppingCartIcon />
+
+          </Button>
+
+        </CardActions>
+
+
+      </Card>
+      <TextField
         sx={{ marginBottom: 4 }}
         label="Buscar juegos"
         variant="outlined"

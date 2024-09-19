@@ -14,6 +14,13 @@ export const venderGame = (formData) => {
     return axios.post(`${baseUrl}games`,formData);
 }
 
+export const eliminarGame = (id) => {
+    return axios.delete(`${baseUrl}games/${id}`);
+}
+
+export const actualizarGame = (id,formData) => {
+    return axios.put(`${baseUrl}games/${id}`,formData);
+}
 export const getGames = () => {
     return axios.get(`${baseUrl}games`);
 }
